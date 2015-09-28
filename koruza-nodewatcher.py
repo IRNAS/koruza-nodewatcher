@@ -77,8 +77,8 @@ if not os.path.exists(NODEWATCHER_CERTIFICATE):
     # Store certificate file.
     try:
         with open(NODEWATCHER_CERTIFICATE, 'wt') as certificate_file:
-            certificate_file.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, certificate))
             certificate_file.write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, private_key))
+            certificate_file.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, certificate))
     except IOError:
         print "ERROR: Failed to write certificate to '%s'!" % NODEWATCHER_CERTIFICATE
         sys.exit(1)
