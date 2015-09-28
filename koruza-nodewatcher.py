@@ -15,8 +15,9 @@ KORUZA_DATABASE = '/var/tmp/koruza/database.db'
 NODEWATCHER_PUSH_INTERVAL = 300
 # Nodewatcher push URL.
 NODEWATCHER_PUSH_URL = 'https://push.nodes.wlan-si.net/push/http/%(uuid)s'
-# Private key and certificate location (combined file).
+# Private key and certificate location.
 NODEWATCHER_CERTIFICATE = '/root/nodewatcher-authentication.crt'
+NODEWATCHER_PRIVATE_KEY = '/root/nodewatcher-authentication.key'
 # Sensor data that should be reported.
 REPORT_SENSOR_DATA = {
     'motor_accel': {'name': "Motor Acceleration", 'unit': ""},
@@ -52,7 +53,7 @@ node_uuid = uuid.uuid5(KORUZA_UUID_NAMESPACE, hex(uuid.getnode()).upper()[2:-1])
 print "INIT: Initialized on node with UUID '%s'." % str(node_uuid)
 
 # Generate private key and certifikate if needed.
-if not os.path.exists(NODEWATCHER_CERTIFICATE):
+if not os.path.exists(NODEWATCHER_CERTIFICATE) or not os.path.exists(NODEWATCHER_PRIVATE_KEY):
     print "INIT: Generating nodewatcher authentication certificate..."
 
     # Generate private key.
@@ -77,8 +78,10 @@ if not os.path.exists(NODEWATCHER_CERTIFICATE):
     # Store certificate file.
     try:
         with open(NODEWATCHER_CERTIFICATE, 'wt') as certificate_file:
-            certificate_file.write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, private_key))
             certificate_file.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, certificate))
+
+        with open(NODEWATCHER_PRIVATE_KEY, 'wt') as key_file:
+            key_file.write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, private_key))
     except IOError:
         print "ERROR: Failed to write certificate to '%s'!" % NODEWATCHER_CERTIFICATE
         sys.exit(1)
@@ -123,7 +126,7 @@ while True:
                     request = requests.post(
                         NODEWATCHER_PUSH_URL % {'uuid': str(node_uuid)},
                         data=json.dumps(feed),
-                        cert=NODEWATCHER_CERTIFICATE,
+                        cert=(NODEWATCHER_CERTIFICATE, NODEWATCHER_PRIVATE_KEY),
                     )
 
                     # Check for successful post.
