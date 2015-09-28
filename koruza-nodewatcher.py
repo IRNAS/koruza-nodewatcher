@@ -134,7 +134,7 @@ while True:
                         print "WARNING: Received failure while pushing to nodewatcher."
                     else:
                         print "OK: Data pushed to nodewatcher."
-                except (requests.HTTPError, ValueError):
+                except (requests.HTTPError, requests.ConnectionError, ValueError):
                     print "WARNING: Failed to push data to nodewatcher."
             finally:
                 cursor.close()
