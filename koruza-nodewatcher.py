@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import json
 import os
 import requests
@@ -16,8 +17,8 @@ NODEWATCHER_PUSH_INTERVAL = 300
 # Nodewatcher push URL.
 NODEWATCHER_PUSH_URL = 'https://push.nodes.wlan-si.net/push/http/%(uuid)s'
 # Private key and certificate location.
-NODEWATCHER_CERTIFICATE = '/root/nodewatcher-authentication.crt'
-NODEWATCHER_PRIVATE_KEY = '/root/nodewatcher-authentication.key'
+NODEWATCHER_CERTIFICATE = '/koruza/config/nodewatcher-authentication.crt'
+NODEWATCHER_PRIVATE_KEY = '/koruza/config/nodewatcher-authentication.key'
 # Sensor data that should be reported.
 REPORT_SENSOR_DATA = {
     'motor_accel': {'name': "Motor Acceleration", 'unit': ""},
@@ -140,7 +141,7 @@ while True:
                 cursor.close()
         finally:
             database.close()
-    except sqlite3.OperationalError:
+    except (sqlite3.OperationalError, AttributeError):
         print "WARNING: Failed to access the status database."
 
     time.sleep(NODEWATCHER_PUSH_INTERVAL)
